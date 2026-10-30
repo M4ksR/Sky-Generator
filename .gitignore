@@ -1,0 +1,67 @@
+
+# C++ / CMake
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Compiled binaries
+*.exe
+*.obj
+*.o
+*.lib
+*.dll
+*.pdb
+*.ilk
+*.idb
+
+# Visual Studio / IDE
+.vs/
+.idea/
+.vscode/
+
+*.user
+*.suo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Flet / Flutter
+.flet/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated distributions
+dist/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+
+# Operating systems
+.DS_Store
+Thumbs.db
+desktop.ini
