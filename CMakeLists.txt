@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(Sky-Generator
     core/src/main.cpp
     core/src/Image.cpp
+    core/src/SkyboxConverter.cpp
 )
 
 target_include_directories(Sky-Generator PRIVATE

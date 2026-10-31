@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Image.hpp"
+#include "SkyboxConverter.hpp"
 
 int main(int argc, char* argv[]) {
     {
@@ -35,6 +36,12 @@ int main(int argc, char* argv[]) {
         }
         // разноцветное изображение
         img.save("C:\\Users\\Maksr\\Desktop\\imgOutputSecond.png");
+    }
+
+    {
+        Vec3 direction{0, 0, 1};
+        Vec2 directionUV = directionToUV(direction);
+        std::cout << directionUV.u << " " << directionUV.v << std::endl;
     }
 
     return 0;
