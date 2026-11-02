@@ -27,3 +27,5 @@ Vec3 pixelDirection(CubeFace face, int x, int y, int faceSize);
 Vec2 directionToUV(const Vec3& direction);
 
 Pixel sampleBilinear(const Image& image, const Vec2& uv);
+
+Image generateFace(const Image& panorama, CubeFace face, int faceSize);

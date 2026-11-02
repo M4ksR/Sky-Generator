@@ -112,3 +112,24 @@ Pixel sampleBilinear(const Image& image, const Vec2& uv) {
         static_cast<uint8_t>(std::round(res[3]))
     };
 }
+
+Image generateFace(const Image& panorama, CubeFace face, int faceSize) {
+    if (faceSize <= 0) {
+        throw std::invalid_argument("faceSize должен быть положительным");
+    }
+
+    if (!(panorama.getWidth() == 4096 && panorama.getHeight() == 2048)) {
+        throw std::invalid_argument("Панорама должна иметь размер 4096×2048");
+    }
+    
+    Image image(faceSize, faceSize);
+    for (int y = 0; y < faceSize; ++y) {
+        for (int x = 0; x < faceSize; ++x) {
+            Vec3 vec3 = pixelDirection(face, x, y, faceSize);
+            Vec2 vec2 = directionToUV(vec3);
+            Pixel pixel = sampleBilinear(panorama, vec2);
+            image.setPixel(x, y, pixel);
+        }
+    }
+    return image;
+}

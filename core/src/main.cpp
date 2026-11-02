@@ -44,5 +44,24 @@ int main(int argc, char* argv[]) {
         std::cout << directionUV.u << " " << directionUV.v << std::endl;
     }
 
+    {
+        Image img;
+        img.load("C:\\Users\\Maksr\\Desktop\\panorama.jpg");
+        
+        std::vector<std::pair<CubeFace, std::string>> faces = {
+            {CubeFace::PositiveX, "positive_x.png"},
+            {CubeFace::NegativeX, "negative_x.png"},
+            {CubeFace::PositiveY, "positive_y.png"},
+            {CubeFace::NegativeY, "negative_y.png"},
+            {CubeFace::PositiveZ, "positive_z.png"},
+            {CubeFace::NegativeZ, "negative_z.png"}
+        };
+
+        for (auto face : faces) {
+            Image newImg = generateFace(img, face.first, 1024);
+            newImg.save("C:\\Users\\Maksr\\Desktop\\" + face.second);
+        }
+    }
+
     return 0;
 }
