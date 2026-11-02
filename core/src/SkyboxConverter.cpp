@@ -41,5 +41,74 @@ Vec2 directionToUV(const Vec3& direction) {
     return Vec2{u, v};
 }
 
-// реализовать
-Pixel sampleBilinear(const Image& image, const Vec2& uv) {}
+double lerp(double a, double b, double t) {
+    return a * (1.0 - t) + b * t;
+}
+
+Pixel sampleBilinear(const Image& image, const Vec2& uv) {
+    int width = image.getWidth();
+    int height = image.getHeight();
+
+    if (width <= 0 || height <= 0) {
+        throw std::invalid_argument("Изображение должно быть не пустым");
+    }
+
+    double x = uv.u * width - 0.5;
+    double y = uv.v * height - 0.5;
+
+    y = std::clamp(y, 0.0, static_cast<double>(height - 1));
+    
+    int x0 = static_cast<int>(std::floor(x));
+    int y0 = static_cast<int>(std::floor(y));
+    int x1 = x0 + 1;
+    int y1 = std::min(y0 + 1, height - 1);
+
+    x0 = ((x0 % width) + width) % width;
+    x1 = ((x1 % width) + width) % width;
+
+    Pixel topLeft = image.getPixel(x0, y0);
+    Pixel topRight = image.getPixel(x1, y0);
+    Pixel bottomLeft = image.getPixel(x0, y1);
+    Pixel bottomRight = image.getPixel(x1, y1);
+    
+    double dx = x - std::floor(x);
+    double dy = y - std::floor(y);
+
+    double res[4] = {};
+
+    {
+        double top = lerp(topLeft.r, topRight.r, dx);
+        double bottom = lerp(bottomLeft.r, bottomRight.r, dx);
+        res[0] = lerp(top, bottom, dy);
+    }
+
+    {
+        double top = lerp(topLeft.g, topRight.g, dx);
+        double bottom = lerp(bottomLeft.g, bottomRight.g, dx);
+        res[1] = lerp(top, bottom, dy);
+    }
+
+    {
+        double top = lerp(topLeft.b, topRight.b, dx);
+        double bottom = lerp(bottomLeft.b, bottomRight.b, dx);
+        res[2] = lerp(top, bottom, dy);
+    }
+
+    {
+        double top = lerp(topLeft.a, topRight.a, dx);
+        double bottom = lerp(bottomLeft.a, bottomRight.a, dx);
+        res[3] = lerp(top, bottom, dy);
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        if (res[i] < 0) { res[i] = 0; }
+        else if (res[i] > 255) { res[i] = 255; }
+    }
+
+    return Pixel {
+        static_cast<uint8_t>(std::round(res[0])),
+        static_cast<uint8_t>(std::round(res[1])),
+        static_cast<uint8_t>(std::round(res[2])),
+        static_cast<uint8_t>(std::round(res[3]))
+    };
+}
