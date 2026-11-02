@@ -133,3 +133,77 @@ Image generateFace(const Image& panorama, CubeFace face, int faceSize) {
     }
     return image;
 }
+
+enum class axes {
+    X,
+    Y
+};
+
+void flip(Image& image, axes axis) {
+    if (axis == axes::X) {
+        for (int y = 0; y < image.getHeight(); ++y) {
+            for (int currX = 0; currX < image.getWidth() / 2; ++currX) {
+                int swapX = image.getWidth() - 1 - currX;
+
+                Pixel currPixel = image.getPixel(currX, y);
+                Pixel swapPixel = image.getPixel(swapX, y);
+
+                image.setPixel(currX, y, swapPixel);
+                image.setPixel(swapX, y, currPixel);
+            }
+        }
+    }
+    else if (axis == axes::Y) {
+        for (int currY = 0; currY < image.getHeight() / 2; ++currY) {
+            for (int x = 0; x < image.getWidth(); ++x) {
+                int swapY = image.getHeight() - 1 -currY;
+
+                Pixel currPixel = image.getPixel(x, currY);
+                Pixel swapPixel = image.getPixel(x, swapY);
+
+                image.setPixel(x, currY, swapPixel);
+                image.setPixel(x, swapY, currPixel);
+            }
+        }
+    }
+    else {
+        throw std::invalid_argument("Поворот должен осуществляться либо по оси Ox либо по оси Oy");
+    }
+}
+
+struct Transformation {
+    CubeFace direction;
+    int xMax;
+    int yMax;
+    axes axis;
+};
+
+Image generateAtlas(const Image& panorama, int faceSize) {
+    if (faceSize <= 0) {
+        throw std::invalid_argument("faceSize должен быть положительным");
+    }
+
+    Image image(faceSize * 3, faceSize * 2);
+
+    std::vector<Transformation> faces = {
+        Transformation{CubeFace::PositiveX, faceSize * 3, faceSize * 2, axes::X},
+        Transformation{CubeFace::NegativeX, faceSize, faceSize * 2, axes::X},
+        Transformation{CubeFace::PositiveY, faceSize * 2, faceSize, axes::Y},
+        Transformation{CubeFace::NegativeY, faceSize, faceSize, axes::Y},
+        Transformation{CubeFace::PositiveZ, faceSize * 3, faceSize, axes::X},
+        Transformation{CubeFace::NegativeZ, faceSize * 2, faceSize * 2, axes::X}
+    };
+
+    for (auto face : faces) {
+        Image newFace = generateFace(panorama, face.direction, faceSize);
+        flip(newFace, face.axis);
+        for (int y = face.yMax - faceSize; y < face.yMax; ++y) {
+            for (int x = face.xMax - faceSize; x < face.xMax; ++x) {
+                Pixel currPixel = newFace.getPixel(x % faceSize, y % faceSize);
+                image.setPixel(x, y, currPixel);
+            }
+        }
+    }
+
+    return image;
+}

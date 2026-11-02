@@ -29,3 +29,5 @@ Vec2 directionToUV(const Vec3& direction);
 Pixel sampleBilinear(const Image& image, const Vec2& uv);
 
 Image generateFace(const Image& panorama, CubeFace face, int faceSize);
+
+Image generateAtlas(const Image& panorama, int faceSize);
