@@ -49,6 +49,7 @@ htmlcov/
 
 # Generated distributions
 dist/
+output/
 
 # Environment variables
 .env
