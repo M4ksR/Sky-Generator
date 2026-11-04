@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
+#include <memory>
 #include <stdexcept>
 
 #include "Image.hpp"
@@ -30,20 +31,36 @@ void Image::setPixel(int x, int y, const Pixel& pixel) {
 }
 
 void Image::load(const std::string& path) {
-   unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 4);
+   int w = 0;
+   int h = 0;
+   int chan = 0;
+
+   unsigned char* data = stbi_load(path.c_str(), &w, &h, &chan, 4);
    
    if (data == nullptr) {
       throw std::runtime_error("Ошибка загрузки пикселей");
    }
 
-   pixels.resize(static_cast<size_t>(width) * height);
+   std::unique_ptr<unsigned char, decltype(&stbi_image_free)> guard(data, &stbi_image_free);
+   
+   size_t size = static_cast<size_t>(w) * h;
+   std::vector<Pixel> tmpPixels; 
+   tmpPixels.resize(size);
 
-   for (int i = 0; i < width * height * 4; i += 4) {
-      int index = (i >> 2);
-      pixels[index] = Pixel{data[i], data[i+1], data[i+2], data[i+3]};
+   for (size_t i = 0; i < size; ++i) {
+      size_t index = i << 2;
+      tmpPixels[i] = Pixel{
+         data[index], 
+         data[index+1], 
+         data[index+2], 
+         data[index+3]
+      };
    }
 
-   stbi_image_free(data);
+   pixels.swap(tmpPixels);
+   width = w;
+   height = h;
+   channels = chan;
 }
 
 void Image::save(const std::string& path) const {

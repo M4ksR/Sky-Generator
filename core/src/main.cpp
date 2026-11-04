@@ -1,67 +1,27 @@
 #include <iostream>
 
 #include "Image.hpp"
-#include "SkyboxConverter.hpp"
+#include "ResourcePackBuilder.hpp"
 
 int main(int argc, char* argv[]) {
-    {
-        Image img;
-        img.load("C:\\Users\\Maksr\\Desktop\\img.jpg");
-        
-        std::cout << img.getWidth() << " " << img.getHeight() << std::endl;
-        
-        Pixel pix = img.getPixel(0,0);
-
-        std::cout << static_cast<int>(pix.r) << " " 
-                    << static_cast<int>(pix.g) << " " 
-                    << static_cast<int>(pix.b) << " " 
-                    << static_cast<int>(pix.a) << std::endl;
-    }
-
-    {
-        Image img(16, 16);
-        // пустое изображение
-        img.save("C:\\Users\\Maksr\\Desktop\\imgOutputFirst.png");
-        for (int y = 0; y < 16; ++y) {
-            for (int x = 0; x < 16; ++x) {
-                Pixel pixel;
-
-                if (x < 4) { pixel = Pixel{255,0,0,255}; }
-                else if (4 <= x && x < 8) { pixel = Pixel{0,255,0,255}; }
-                else if (8 <= x && x < 12) { pixel = Pixel{0,0,255,255}; }
-                else if (12 <= x && x < 16) { pixel = Pixel{255,255,255,255}; }
-
-                img.setPixel(x,y,pixel);
-            }
+    try { 
+        if (argc != 2) {
+            throw std::invalid_argument(
+                "На вход должно подаваться 1 аргумент - путь_к_изображению"
+            );
         }
-        // разноцветное изображение
-        img.save("C:\\Users\\Maksr\\Desktop\\imgOutputSecond.png");
+
+        Image panorama;
+        panorama.load(argv[1]);
+
+        std::filesystem::path projectRoot = std::filesystem::current_path(); 
+        buildResourcePack(panorama, projectRoot);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
     }
 
-    {
-        Vec3 direction{0, 0, 1};
-        Vec2 directionUV = directionToUV(direction);
-        std::cout << directionUV.u << " " << directionUV.v << std::endl;
-    }
-
-    {
-        Image img;
-        img.load("C:\\Users\\Maksr\\Desktop\\panorama.jpg");
-        
-        std::vector<std::pair<CubeFace, std::string>> faces = {
-            {CubeFace::PositiveX, "positive_x.png"},
-            {CubeFace::NegativeX, "negative_x.png"},
-            {CubeFace::PositiveY, "positive_y.png"},
-            {CubeFace::NegativeY, "negative_y.png"},
-            {CubeFace::PositiveZ, "positive_z.png"},
-            {CubeFace::NegativeZ, "negative_z.png"}
-        };
-
-        for (auto face : faces) {
-            Image newImg = generateFace(img, face.first, 1024);
-            newImg.save("C:\\Users\\Maksr\\Desktop\\" + face.second);
-        }
-    }
-
+    std::cout << "OK: resourcepack generated successfully" << std::endl;
     return 0;
 }

@@ -9,6 +9,7 @@ add_executable(Sky-Generator
     core/src/main.cpp
     core/src/Image.cpp
     core/src/SkyboxConverter.cpp
+    core/src/ResourcePackBuilder.cpp
 )
 
 target_include_directories(Sky-Generator PRIVATE
